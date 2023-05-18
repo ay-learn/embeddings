@@ -29,8 +29,15 @@ def create_database(documents):
     vectordb = Chroma.from_documents(
         documents=docs, embedding=embeddings, persist_directory=persist_directory
     )
-    vectordb.persist()
+    try:
+        vectordb.persist()
+    except Exception as e:
+        print(f"An error occurred while persisting the vectordb: {e}")
 
+def add_to_database(file):
+    loader = TextLoader(file)
+    documents = loader.load()
+    create_database(documents)
 
 def main():
     parser = argparse.ArgumentParser(description="Embedding this file")
@@ -45,9 +52,7 @@ def main():
             print(f"File '{args.file}' not found.")
             return
 
-    loader = TextLoader(args.file)
-    documents = loader.load()
-    create_database(documents)
+    add_to_database(args.file)
 
 
 if __name__ == "__main__":
