@@ -3,10 +3,11 @@ import argparse
 import os
 
 from langchain.document_loaders import TextLoader
-# from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
+
+# from langchain.embeddings.openai import OpenAIEmbeddings
 
 
 def create_database(documents):
@@ -23,7 +24,7 @@ def create_database(documents):
     docs = text_splitter.split_documents(documents)
 
     # embeddings = OpenAIEmbeddings()
-    embeddings =  HuggingFaceEmbeddings()
+    embeddings = HuggingFaceEmbeddings()
     # Embed and store the texts
     vectordb = Chroma.from_documents(
         documents=docs, embedding=embeddings, persist_directory=persist_directory
