@@ -3,13 +3,14 @@ import argparse
 import os
 
 from langchain.document_loaders import TextLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
+# from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import Chroma
 
 
 def create_database(documents):
-    persist_directory = "/data/projects/embedding/db"
+    persist_directory = "/data/projects/embedding/hf"
     parent_directory = os.path.dirname(persist_directory)
 
     if not os.path.exists(parent_directory):
@@ -21,10 +22,11 @@ def create_database(documents):
     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     docs = text_splitter.split_documents(documents)
 
-    embedding = OpenAIEmbeddings(client="")
+    # embeddings = OpenAIEmbeddings()
+    embeddings =  HuggingFaceEmbeddings()
     # Embed and store the texts
     vectordb = Chroma.from_documents(
-        documents=docs, embedding=embedding, persist_directory=persist_directory
+        documents=docs, embedding=embeddings, persist_directory=persist_directory
     )
     vectordb.persist()
 
