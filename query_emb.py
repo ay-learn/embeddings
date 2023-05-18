@@ -1,35 +1,37 @@
 #!/usr/bin/env python3
 import argparse
+import asyncio
+import contextlib
 import os
 
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
 
-def vec_database(persist_directory,query):
-    embedding = OpenAIEmbeddings()
-    # Load the persisted database from disk.
-    vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding)
-    return vectordb.similarity_search(query)
+# from langchain.embeddings.openai import OpenAIEmbeddings
 
-def query_database(query):
-    persist_directory = "/data/projects/embedding/db"
+
+async def query_database(query, persist_directory):
+    # embeddings = OpenAIEmbeddings()
+    embeddings = HuggingFaceEmbeddings()
+    # Load the persisted database from disk.
+    vectordb = Chroma(
+        persist_directory=persist_directory, embedding_function=embeddings
+    )
+    docs = vectordb.similarity_search(query)
+    # for prevent some stdout lazy unloading and outputing in stdout
+    vectordb = None
+    return docs[0].page_content
+
+
+def check_database(persist_directory):
     parent_directory = os.path.dirname(persist_directory)
 
     if not os.path.exists(parent_directory):
         print("Parent directory does not exist!")
-        return
+        exit(1)
 
 
-    # hide some stdoutput
-    # TODO: what if failed to connect with db/internel/api
-    import contextlib
-    with contextlib.redirect_stdout(None):
-        docs = vec_database(persist_directory,query)
-
-    return docs[0].page_content
-
-
-def main():
+async def main():
     parser = argparse.ArgumentParser(description="Embedding this file")
     parser.add_argument("query", type=str, nargs="?", help="Query embedding")
     args = parser.parse_args()
@@ -37,9 +39,16 @@ def main():
         print("Please provide the query text")
         return
 
-    answer = query_database(args.query)
+    # hide some stdoutput
+    # TODO: what if failed to connect with db/internel/api
+
+    persist_directory = "/data/projects/embedding/hf"
+    check_database(persist_directory)
+
+    with contextlib.redirect_stdout(None):
+        answer = await query_database(args.query, persist_directory)
     print(answer)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
