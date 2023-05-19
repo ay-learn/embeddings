@@ -4,6 +4,7 @@ import os
 
 from add_emb import add_to_database
 
+
 def list_files(dir):
     """Returns a list of all files in the given directory and its subdirectories"""
     files = []
@@ -23,7 +24,9 @@ def list_files(dir):
         ".typ",
     ]
 
-    for root, _ , filenames in os.walk(dir):
+    # extensions = [".md"]
+
+    for root, _, filenames in os.walk(dir):
         for filename in filenames:
             filepath = os.path.join(root, filename)
             # check if file is not empty
@@ -31,6 +34,7 @@ def list_files(dir):
                 if filename.endswith(tuple(extensions)):
                     files.append(filepath)
     return files
+
 
 def main():
     parser = argparse.ArgumentParser(description="List all files in a directory")
@@ -45,8 +49,8 @@ def main():
     # List and print all files in the directory
     files = list_files(args.dir)
     print(f"There are {len(files)} files in '{args.dir}':")
-    for file in files:
-        print(f"file: {file}")
+    for i, file in enumerate(files):
+        print(f"{i+1}/{len(files)}: {file}")
         add_to_database(file)
 
 
