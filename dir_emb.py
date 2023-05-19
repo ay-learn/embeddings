@@ -7,11 +7,29 @@ from add_emb import add_to_database
 def list_files(dir):
     """Returns a list of all files in the given directory and its subdirectories"""
     files = []
+    extensions = [
+        ".bash",
+        ".bib",
+        ".c",
+        ".cpp",
+        ".html",
+        ".js",
+        ".lua",
+        ".py",
+        ".rmd",
+        ".sh",
+        ".tex",
+        ".txt",
+        ".typ",
+    ]
+
     for root, _ , filenames in os.walk(dir):
         for filename in filenames:
             filepath = os.path.join(root, filename)
-            if os.path.getsize(filepath) > 0: # check if file is not empty
-                files.append(filepath)
+            # check if file is not empty
+            if os.path.getsize(filepath) > 0:
+                if filename.endswith(tuple(extensions)):
+                    files.append(filepath)
     return files
 
 def main():
