@@ -16,6 +16,7 @@ def list_files(dir):
         ".html",
         ".js",
         ".lua",
+        ".md",
         ".py",
         ".rmd",
         ".sh",
