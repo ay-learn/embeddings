@@ -16,7 +16,7 @@ from langchain.vectorstores import Chroma
 
 
 def create_database(docs):
-    persist_directory = "/data/projects/embedding/hf"
+    persist_directory = "/data/projects/embedding/hf2"
     parent_directory = os.path.dirname(persist_directory)
 
     if not os.path.exists(parent_directory):
