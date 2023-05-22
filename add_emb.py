@@ -38,6 +38,11 @@ def create_database(docs):
 
 def add_to_database(file):
     filename = file
+    processed_files = get_processed_files("file.db")
+    if processed(file, processed_files):
+        print(f"already embedded {file}")
+        return
+
     file = pathlib.Path(file).read_text()
     if file.endswith(".py"):
         python_splitter = PythonCodeTextSplitter(chunk_size=30, chunk_overlap=0)
@@ -59,7 +64,6 @@ def add_to_database(file):
         docs = text_splitter.create_documents([file])
     try:
         create_database(docs)
-        processed_files=get_processed_files("file.db")
         append_file(filename, "file.db", processed_files)
     except Exception as e:
         print(f"An error occurred while persisting the vectordb: {e}")
@@ -79,15 +83,7 @@ def main():
             print(f"File '{args.file}' not found.")
             return
 
-    processed_files = get_processed_files("file.db")
-    # tracing lsit of files
-    # print(processed_files)
-    # print(processed(args.file, processed_files))
-
-    if not processed(args.file, processed_files):
-        add_to_database(args.file)
-    else:
-        print(f"already embedded {args.file}")
+    add_to_database(args.file)
 
 
 if __name__ == "__main__":
