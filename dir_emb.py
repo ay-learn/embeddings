@@ -9,20 +9,20 @@ def list_files(dir):
     """Returns a list of all files in the given directory and its subdirectories"""
     files = []
     extensions = [
-        ".bash",
-        ".bib",
-        ".c",
-        ".cpp",
-        ".html",
-        ".js",
-        ".lua",
+        # ".bash",
+        # ".bib",
+        # ".c",
+        # ".cpp",
+        # ".js",
+        # ".lua",
+        # ".sh",
         ".md",
+        # ".html", # i do not have a new html files, just md--> book(html)
         ".py",
         ".rmd",
-        ".sh",
         ".tex",
         ".txt",
-        ".typ",
+        # ".typ", # do not use my llm generated text now
     ]
 
     # extensions = [".md"]
