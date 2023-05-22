@@ -13,10 +13,10 @@ from langchain.vectorstores import Chroma
 from HistoryDB import append_file
 from HistoryDB import get_processed_files
 from HistoryDB import processed
+
 # from langchain.document_loaders import TextLoader
 
 # from langchain.embeddings.openai import OpenAIEmbeddings
-
 
 
 def create_database(docs):
@@ -41,22 +41,26 @@ def add_to_database(file):
     processed_files = get_processed_files("file.db")
     if processed(file, processed_files):
         print(f"already embedded {file}")
-        return
+        # remove it
+        # return
 
     file = pathlib.Path(file).read_text()
-    if file.endswith(".py"):
-        python_splitter = PythonCodeTextSplitter(chunk_size=30, chunk_overlap=0)
+    if filename.endswith(".py"):
+        print("py files")
+        python_splitter = PythonCodeTextSplitter(chunk_size=200, chunk_overlap=0)
         docs = python_splitter.create_documents([file])
-    if file.endswith(".tex"):
-        latex_splitter = LatexTextSplitter(chunk_size=400, chunk_overlap=0)
+    if filename.endswith(".tex"):
+        print("tex files")
+        latex_splitter = LatexTextSplitter(chunk_size=500, chunk_overlap=0)
         docs = latex_splitter.create_documents([file])
-    if file.endswith(".md"):
+    if filename.endswith(".md"):
+        print("md files")
         markdown_splitter = MarkdownTextSplitter(chunk_size=1000, chunk_overlap=50)
         docs = markdown_splitter.create_documents([file])
     else:
+        print("else files")
         text_splitter = RecursiveCharacterTextSplitter(
-            # Set a really small chunk size, just to show.
-            chunk_size=200,
+            chunk_size=800,
             chunk_overlap=20,
             length_function=len,
         )
