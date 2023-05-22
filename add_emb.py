@@ -41,8 +41,7 @@ def add_to_database(file):
     processed_files = get_processed_files("file.db")
     if processed(file, processed_files):
         print(f"already embedded {file}")
-        # remove it
-        # return
+        return
 
     file = pathlib.Path(file).read_text()
     if filename.endswith(".py"):
