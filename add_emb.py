@@ -3,20 +3,24 @@ import argparse
 import os
 import pathlib
 
-# from langchain.document_loaders import TextLoader
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.text_splitter import MarkdownTextSplitter
 from langchain.text_splitter import LatexTextSplitter
+from langchain.text_splitter import MarkdownTextSplitter
 from langchain.text_splitter import PythonCodeTextSplitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
+
+from HistoryDB import append_file
+from HistoryDB import get_processed_files
+from HistoryDB import processed
+# from langchain.document_loaders import TextLoader
 
 # from langchain.embeddings.openai import OpenAIEmbeddings
 
 
 
 def create_database(docs):
-    persist_directory = "/data/projects/embedding/hf2"
+    persist_directory = "/data/projects/embedding/hf3"
     parent_directory = os.path.dirname(persist_directory)
 
     if not os.path.exists(parent_directory):
@@ -33,6 +37,7 @@ def create_database(docs):
 
 
 def add_to_database(file):
+    filename = file
     file = pathlib.Path(file).read_text()
     if file.endswith(".py"):
         python_splitter = PythonCodeTextSplitter(chunk_size=30, chunk_overlap=0)
@@ -46,14 +51,16 @@ def add_to_database(file):
     else:
         text_splitter = RecursiveCharacterTextSplitter(
             # Set a really small chunk size, just to show.
-            chunk_size = 200,
-            chunk_overlap  = 20,
-            length_function = len,
+            chunk_size=200,
+            chunk_overlap=20,
+            length_function=len,
         )
 
         docs = text_splitter.create_documents([file])
     try:
         create_database(docs)
+        processed_files=get_processed_files("file.db")
+        append_file(filename, "file.db", processed_files)
     except Exception as e:
         print(f"An error occurred while persisting the vectordb: {e}")
     print("---")
@@ -72,7 +79,15 @@ def main():
             print(f"File '{args.file}' not found.")
             return
 
-    add_to_database(args.file)
+    processed_files = get_processed_files("file.db")
+    # tracing lsit of files
+    # print(processed_files)
+    # print(processed(args.file, processed_files))
+
+    if not processed(args.file, processed_files):
+        add_to_database(args.file)
+    else:
+        print(f"already embedded {args.file}")
 
 
 if __name__ == "__main__":
