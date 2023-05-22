@@ -17,13 +17,13 @@ async def query_database(query, persist_directory):
     vectordb = Chroma(
         persist_directory=persist_directory, embedding_function=embeddings
     )
-    docs = vectordb.similarity_search(query)
+    docs = vectordb.similarity_search(query,k=2)
     # docs = vectordb.search(query,"similarity")
     # print(docs)
     # for prevent some stdout lazy unloading and outputing in stdout
-    # vectordb = None
+    vectordb = None
     # vectordb.persist()
-    return docs[0].page_content
+    return docs
     # return "---"
 
 
@@ -49,10 +49,13 @@ async def main():
     persist_directory = "/data/projects/embedding/hf3"
     check_database(persist_directory)
 
-    # with contextlib.redirect_stdout(None):
-    #     answer = await query_database(args.query, persist_directory)
-    answer = await query_database(args.query, persist_directory)
-    print(answer)
+    with contextlib.redirect_stdout(None):
+        docs = await query_database(args.query, persist_directory)
+
+    for doc in docs:
+        print("--")
+        print(doc.page_content)
+
 
 
 if __name__ == "__main__":
